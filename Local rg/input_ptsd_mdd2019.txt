@@ -1,0 +1,3 @@
+phenotype cases controls filename
+ptsd NA NA eur_ptsd_pcs_v4_aug3_2021.fuma.gz.lava
+mdd 246363 561190  PGC_UKB_depression_genome-wide.txt_2.lava

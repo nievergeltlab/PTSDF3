@@ -1,0 +1,3 @@
+ptsd mdd
+ptsd 1 0.2002
+mdd 0.2002 1

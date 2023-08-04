@@ -1,0 +1,153 @@
+library(data.table)
+d1 <- fread('eur_study_ns2.txt',data.table=F)
+d2 <- fread('eur_study_types.txt',data.table=F)
+d1x <- fread('eur_study_ns.txt',data.table=F)
+
+dm <- merge(d1,d2,by="STUDY")
+dmx <- merge(d1x,d2,by="STUDY")
+
+
+#I think this is fucked somehow
+df2x <- subset(dmx,TYPE=="F2" & STUDY=="UKBB")
+
+df2 <- rbind(df2x,dm)
+
+
+maxn = max(df2$N)
+minn = min(df2$N)
+
+#Draw boxes for each trait, wdith proportional to N..
+#subdivide so that all fit in proportionally to this, order by size or alphabet, continue to next row...
+#would be better with a fitting algorithm..
+
+#positional values relative to N
+ chrfile$cumpos <- cumsum(as.numeric(chrfile$n))- maxn
+
+
+ how do you make this into a fitting box?
+
+#Just use an algorithm so that the boxes can be summed to an equal size (or minimum value),
+
+while(boxtol <= 0.05 (#get as close as possible)
+
+
+A list of collections to be plotted on the same rows.. perhaps easier to BIN the boxes into small, medium, large, xl...
+
+bin1 = 250
+bin2 = 1000
+bin3 = 4000
+bin4= 16000
+bin5= 150000
+
+df2$bin <- NA
+df2[which(df2$N <= 250),]$bin <- 1
+df2[which(df2$N > 250 & df2$N <= 1000),]$bin <- 4
+df2[which(df2$N > 1000 & df2$N <= 4000),]$bin <- 8
+df2[which(df2$N > 4000 & df2$N <= 17000),]$bin <- 16
+df2[which(df2$N > 17000 & df2$N <= 150000),]$bin <- 16
+
+
+
+df2 <- df2[order(df2$N),]
+
+ df2$cumpos <- cumsum(as.numeric(df2$N)) - 26
+ df2$rectrow <- 1
+ df2[dim(df2)[1],]$rectrow=2
+ df2$rowplot <- NA
+ df2[1:14, ]$rowplot <- 1
+ df2[15:30,]$rowplot <- 2
+ df2[31:34,]$rowplot <- 3
+ df2[35:38,]$rowplot <- 4
+ df2[39:42,]$rowplot <- 5
+ df2[43:44,   ]$rowplot <- 6
+ df2[45:46,   ]$rowplot <- 7
+ df2[47:48,   ]$rowplot <- 8
+ df2[49:50,   ]$rowplot <- 9
+ df2[51:52,   ]$rowplot <- 10
+ df2[53:54,   ]$rowplot <- 11
+ df2[55,   ]$rowplot <- 12
+  df2[56,   ]$rowplot <- 13
+   df2[57,   ]$rowplot <- 14
+   df2[58,   ]$rowplot <- 15
+   df2[59,   ]$rowplot <- 16
+   df2[60,   ]$rowplot <- 17
+    df2[61,   ]$rowplot <- 18
+    df2[62,   ]$rowplot <- 19
+   
+  
+   
+ plot(xlim=c(0,),ylim=c(0,19)
+ #plot in a width between boxes
+ for (k in 1:dim(trait_matrix)[1])
+{
+
+#Generate a dataframe for the boxes
+
+#Plot N bins row 1
+for (j in 1:nbinsrow1)
+{
+ recttext(trait_matrix[k,]$posXL,trait_matrix[k,]$posYB,trait_matrix[k,]$posXR,trait_matrix[k,]$posYT,trait_matrix[k,]$trait)
+ 
+}
+
+
+#two rows effecitivel... ukbb and then the rest...
+
+
+#5 bin1s to a bin2, 
+
+df3 <- df2
+names(df3)[1:2] <- c("group","value")
+
+df3 <- subset(df3,group!="UKBB")
+ 
+
+
+# Libraries
+library(packcircles)
+library(ggplot2)
+ library(viridis)
+ data <- df3[,1:2]
+
+
+# Generate the layout. This function return a dataframe with one line per bubble. 
+# It gives its center (x and y) and its radius, proportional of the value
+packing <- circleProgressiveLayout(data$value, sizetype='area')
+ 
+# We can add these packing information to the initial data frame
+data <- cbind(data, packing)
+ 
+# Check that radius is proportional to value. We don't want a linear relationship, since it is the AREA that must be proportionnal to the value
+# plot(data$radius, data$value)
+ 
+# The next step is to go from one center + a radius to the coordinates of a circle that
+# is drawn by a multitude of straight lines.
+dat.gg <- circleLayoutVertices(packing, npoints=50)
+ 
+blue1 <- seq(from=13, to =183 ,by=2)
+
+colorpalette <- rgb(255/255,238/255,blue1/255)
+
+255 238 183
+
+
+ 
+# Make the plot
+ggplot() + 
+  
+  # Make the bubbles
+  geom_polygon(data = dat.gg, aes(x, y, group = id, fill=as.factor(id)), colour = "black", alpha = 0.6) +
+  scale_fill_manual(values = colorpalette) +
+ 
+  # Add text in the center of each bubble + control its size
+  geom_text(data = data, aes(x, y, size=value, label = group)) +
+  scale_size_continuous(range = c(1,4)) +
+  
+  # General theme:
+  theme_void() + 
+  theme(legend.position="none") +
+  coord_equal()
+  
+  dev.off()
+
+

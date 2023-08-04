@@ -1,0 +1,1 @@
+ zcat /mnt/ukbb/adam/ptsd/freeze3/freeze3_sumstats/eur_ptsd_pcs_v4_aug3_2021.fuma.gz | awk '{if (NR==1) {$3="SNP";$4="A1";$5="A2";$8="BETA";$9="P"}; print $3,toupper($4),toupper($5),$8,$9}' > eur_ptsd_pcs_v4_aug3_2021.fuma.gz.prscs
