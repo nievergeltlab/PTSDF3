@@ -1,0 +1,28 @@
+
+ 
+ MARKERLABEL   MarkerName
+ ALLELELABELS  Allele1 Allele2
+ PVALUELABEL   P-value
+ EFFECTLABEL   Zscore
+ SCHEME SAMPLESIZE
+ #STDERR SE 
+ GENOMICCONTROL OFF
+ #CUSTOMVARIABLE OBS_CT 
+ WEIGHTLABEL Weight
+ FREQLABEL Freq1
+ AVERAGEFREQ ON
+ MINMAXFREQ ON
+ ADDFILTER Freq1 >= 0.01
+ TRACKPOSITIONS ON #Turn off for analyze het
+ CHROMOSOME Chromosome
+ POSITION Position
+ 
+PROCESS eur_ptsd_pcs_v4_aug3_2021.allchr.fuma.gz
+PROCESS aam_ptsd_pcs_v5_jan4_2022.allchr.fuma.gz
+PROCESS hna_ptsd_pcs_v4_aug3_2021.allchr.fuma.gz 
+
+OUTFILE trans_ptsd_pcs_v4_aug3_2021_allchr .tbl
+ANALYZE HET
+QUIT
+
+#

@@ -1,0 +1,57 @@
+
+###PGC-PTSD analyst datasets
+ 
+ MARKERLABEL   ID
+ ALLELELABELS  A1 AX
+ PVALUELABEL   P 
+ EFFECTLABEL   BETA
+ SCHEME SAMPLESIZE
+ #STDERR SE 
+ GENOMICCONTROL OFF
+ #CUSTOMVARIABLE OBS_CT 
+ WEIGHTLABEL OBS_CT
+ FREQLABEL A1_FREQ
+ AVERAGEFREQ ON
+ MINMAXFREQ ON
+ ADDFILTER A1_FREQ >= 0.01
+ TRACKPOSITIONS ON #Turn off for analyze het
+ CHROMOSOME CHROM
+ POSITION POS
+ 
+#Notes: Check on if you need to rescale
+
+ ##Analysis group 1: Continuous PTSD measure studies
+  #1 MRSC
+   PROCESS results_cat/mrsc_mrsc_lat_pcs.Current_PTSD_Continuous.assoc.gz_XXX
+  #1 MRSC
+   PROCESS results_cat/mrsc_cvc_lat_pcs.Current_PTSD_Continuous.assoc.gz_XXX
+   
+  #14 NSS1
+   PROCESS results_cat/nss1_nss1_lat_pcs.Current_PTSD_Continuous.assoc.gz_XXX
+  #15 NSS2
+   PROCESS results_cat/nss2_nss2_lat_pcs.Current_PTSD_Continuous.assoc.gz_XXX
+  #16 PPDS
+   PROCESS results_cat/nss1_ppds_lat_pcs.Current_PTSD_Continuous.assoc.gz_XXX
+  #23 PROM  this is natives and latinos
+   PROCESS results_cat/PROM_PROM_lat_pcs.Current_PTSD_Continuous.assoc.gz_XXX
+  #65 MAMH 
+   PROCESS results_cat/mamh_mamh_lat_pcs.Current_PTSD_Continuous.assoc.gz_XXX
+   
+ ##Analysis group 2: Case control studies with genotype access
+ 
+  EFFECTLABEL  log(OR)
+  WEIGHTLABEL FAKE #OBS_CT is in this data, and counts total N but not effective N. I change the weight label to instead set the weight by hand!
+ 
+ #35 STRO
+  DEFAULTWEIGHT 224 
+  PROCESS results_cat/stro_stro_lat_pcs.Case.assoc.gz_XXX
+  
+ #62 MEDE - includes pue nacetsyr
+  DEFAULTWEIGHT 255
+  PROCESS results_cat/mede_mede_lat_pcs.Case.assoc.gz_XXX
+   
+  
+ 
+OUTFILE metal_results/hna_ptsd_pcs_v4_aug3_2021_XXX .tbl
+ANALYZE 
+QUIT
