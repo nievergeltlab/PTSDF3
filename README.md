@@ -30,7 +30,7 @@ Conduct gene-set analysis of brain datasets
 ### LDSC
 Heritability analyses
 
-## Local rg
+### Local rg
 LAVA local heritability
 
 ### Locuszoom
