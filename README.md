@@ -1,7 +1,9 @@
 # PTSDF3
-This is the public code base for PGC-PTSD Freeze 3.  
+This is the public code base for PGC-PTSD Freeze 3 (Nat Genet, Accepted). Each folder contains the code for a given analysis. Details of operation can be found in code.
   
-Meta-analysis summary statistics will be made available upon publication here: https://pgc.unc.edu/for-researchers/download-results/. Access to study level summary statics and individual level data is facilitated here: https://pgc.unc.edu/for-researchers/data-access-committee/data-access-portal/
+Meta-analysis summary statistics will be made available upon publication here: https://pgc.unc.edu/for-researchers/download-results/. 
+
+Access to study level summary statics and individual level data is facilitated here: https://pgc.unc.edu/for-researchers/data-access-committee/data-access-portal/
 
 ### COJO
 Conditional analysis of SNPs within significant genes (from gene-set analyses)
