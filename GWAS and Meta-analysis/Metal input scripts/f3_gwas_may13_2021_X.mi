@@ -276,7 +276,7 @@
    FREQLABEL AF_Allele2
     ADDFILTER AF_Allele2 >= 0.01
     ADDFILTER  AF_Allele2 <= 0.99
-   ADDFILTER Rsq > 0.6 #this fucks it up if you keep it..
+   ADDFILTER Rsq > 0.6 
    CHROMOSOME CHR
    POSITION POS
    
