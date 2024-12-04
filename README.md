@@ -5,6 +5,25 @@ Meta-analysis summary statistics will be made available upon publication here: h
 
 Access to study level summary statics and individual level data is facilitated here: https://pgc.unc.edu/for-researchers/data-access-committee/data-access-portal/
 
+
+###Notes on the meta-analysis
+•	The GWAS meta-analysis included studies where PTSD was measured as either case/control or PTSD symptoms
+o	The beta estimates from these analysis have distinct meanings and are therefore on different measure scales
+	i.e. log odds of PTSD diagnosis / increase in symptom scores
+	thus not directly combinable in traditional meta-analysis, which creates an average beta value
+•	Instead,  we performed a sample-size weighted, z-score based meta-analysis. 
+o	This does not require the assumption of the same measure scale.
+o	Sample size weighted meta-analysis however does not produce beta values - a beta generated from disparate measure types would not have any direct meaning 
+•	Many post-GWAS still require beta values
+o	We propose to generate these pseudo-beta values based on the formalue provided to you
+o	These betas provide
+	a relative difference in effect sizes between SNPs - i.e. that larger betas mean relatively stronger effects than smaller betas
+	effect directions are preserved - positive is risk increasing, negative is risk decreasing
+o	Because relative effect size and direction are preserved, have been adequate for most analyses
+	In Mendelian randomization, however, this gives no direct quantification of causal effect magnitude - significant MR can only be interpreted as 'risk increasing' or 'risk decreasing'
+
+
+
 ### COJO
 Conditional analysis of SNPs within significant genes (from gene-set analyses)
 
@@ -61,3 +80,5 @@ Make bubble plots from figure 1
 
 ### rg with psychiatric
 Calculate rg with other psychiatric disorders
+
+
