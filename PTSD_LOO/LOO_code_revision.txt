@@ -1,0 +1,133 @@
+
+#LOO master file has one study analysis file per row. Column 1 denotes which studies should be simultaneously removed for LOO analyses
+
+#Identify all unique files (some studies analyzed together, some are part of the same cohort - in both cases, these must be removed for LOO analyses)
+#Loop through each analyses (if you want a particular one, just set LOO_info to the group that needs to be out
+ 
+ #Note: use dos2unix on input .csv file prior to this step!
+ 
+ IFS=$'\n' 
+ 
+#This step will look at the LOO template file and modify the meta-analysis script to remove the studies that need to be removed to complete a LOO analysis
+#The loop is because this step needs to be performed for each LOO analysis
+#Looping over ancestry as well
+
+
+ for LOO_group in $(cat LOO_PTSD_freeze3_"$ancestry".csv | tail -n+2 | awk 'BEGIN{FS=","}{print $1}' | sort -k1 -u )
+ do
+  #European, African, Latin, European (Case/Control), African (Case/Control)
+ for ancestry in eurcc aamcc aam eur aam eurcc aamcc  #lat : skipping due to low N..
+ do
+   
+  
+  #Using the group number, look up all studies to be left out
+   awk -v LOO_group=$LOO_group 'BEGIN{FS=","}{if($1 == LOO_group) print $8}' LOO_PTSD_freeze3_"$ancestry".csv  | awk '/^\s*$/ {next;}   {print}' | dos2unix | sort -u > temp/remove_"$LOO_group"
+  #Because we work with ms excel, there are some newline issues to be resolved in this file:
+  
+   #For some ancestries, no one is in this file, so it is redundant to perform this analysis. Check to make sure this file is nonempty!
+   if [ ! -z $(cat temp/remove_"$LOO_group" | head -n1) ]
+   then
+    #The files listed in the above file will be left out from the metal template script
+     #Also change GWAS output path, 'results_cat' to just 'sumstats', as all files have subsequently been moved to there
+     #Also change the output file names to reflect which group of data was removed
+   echo analysis $LOO_group for $ancestry
+   grep -v -f temp/remove_"$LOO_group"   metal_script_templates/f3_gwas_may13_2021_"$ancestry".mi | sed 's/results_cat/sumstats/g' | sed 's/bychr//g'  \
+   | sed "s/metal_results\/eur_ptsd_pcs_v4_aug3_2021_/LOO_metal_results\/eur_ptsd_pcs_v4_aug3_2021_${LOO_group}_/g" \
+   | sed "s/metal_results\/eur_ptsdcasecontrol_pcs_v5_jan4_2021_/LOO_metal_results\/eur_ptsdcasecontrol_pcs_v5_jan4_2021_${LOO_group}_/g" \
+   | sed "s/metal_results\/aam_ptsd_pcs_v5_jan4_2021_/LOO_metal_results\/aam_ptsd_pcs_v5_jan4_2021_${LOO_group}_/g" \
+   | sed "s/metal_results\/aam_ptsdcasecontrol_pcs_v5_jan4_2021_/LOO_metal_results\/aam_ptsdcasecontrol_pcs_v5_jan4_2021_${LOO_group}_/g" \
+   | sed "s/metal_results\/hna_ptsd_pcs_v4_aug3_2021_/LOO_metal_results\/hna_ptsd_pcs_v4_aug3_2021_${LOO_group}_/g" \
+   > LOO_templates/f3_gwas_may13_2021_"$ancestry"_"$LOO_group".mi
+   fi
+ done
+ done
+
+  #template scripts have a placeholder for the chromosome. 
+  #We use string editing here to change the placeholder to a chromsome,
+  #(it is must faster to do this analysis parallelized by chromosome)
+ for files in $(ls LOO_templates )
+ do
+  for chr in {1..22} X
+  do  
+  ifile=$files
+   sed s/XXX/$chr.gz/g LOO_templates/"$ifile"  >   LOO_metal_scripts/"$ifile"_$chr
+  done
+ done
+ 
+ #List all files - use a random sort because of the way we do our LOO loop
+ ls LOO_metal_scripts/  > metafilelist.txt
+ 
+ split --numeric-suffixes=1 --lines=23 --suffix-length=3 metafilelist.txt metalists/metafilelist.txt_
+ 
+  dataset=PTSD_LOO_test6
+  each gwas takes 15 minutes to run x 100 gwas  ~ 25 hours? parallelize into 20 minute jobs -- approximately 
+  
+
+ sbatch -t 00:20:00 -a 16-144 --error errandout/"$dataset"_%A.e --output errandout/"$dataset"_%A.o   --export=ALL,metafile=metafilelist.txt -D $(pwd) run_meta_v2_loo_v2_array.slurm
+ 
+ #15 minutes per meta-analysis
+ 
+ 
+ #We'll put on a filter saying that we need > 30% of maximum N - very loose, it is up to studies to correct
+ 
+ #Code this into a script also?
+ 
+  sbatch -t 00:20:00 -a 1-n of loo groups --error errandout/combine_"$LOO_group"_%A.e --output errandout/combine_"$LOO_group"_%A.o --export=ALL -D $(pwd) combine_chromosomes.slurm
+ 
+ 
+ #Once this is done (1-94)
+  
+   sbatch -t 00:25:00 -a 1-94 --error errandout/combine_%A.e --output errandout/combine_%A.o --export=ALL -D $(pwd) combine_chromosomes.slurm
+ 
+ 
+ 
+ #manually combine results
+#European
+ totalN=641553
+  totalNX=424500
+  percentN=0.15
+  LOO_group=79
+ 
+   cat LOO_metal_results/eur_ptsd_pcs_v4_aug3_2021_"$LOO_group"_*.gz1.tbl  \
+   | awk  -v totalN=$totalN -v totalNX=$totalNX -v percentN=$percentN   \
+   '{ if (NR ==1 || ($6 >= 0.01 && $6 <= 0.99 && $3 != "MarkerName" && (($1 != "X" && $10 >= percentN*totalN )||( $1 == "X" && $10 >= percentN*totalNX )))) print $1,$2,$3,$4,$5,$6,$10,$11,$12}'  \
+   | grep -v : | sort -g -k 9 | gzip > LOO_results_filtered/eur_ptsd_pcs_v4_aug3_2021_"$LOO_group".fuma.gz
+
+#African
+
+  totalN=42804
+  totalNX=13246.00
+  percentN=0.15
+  
+  cat LOO_metal_results/aam_ptsd_pcs_v5_jan4_2021_"$LOO_group"_*.gz1.tbl  \
+   | awk  -v totalN=$totalN -v totalNX=$totalNX -v percentN=$percentN   \
+   '{ if (NR ==1 || ($6 >= 0.01 && $6 <= 0.99 && $3 != "MarkerName" && (($1 != "X" && $10 >= percentN*totalN )||( $1 == "X" && $10 >= percentN*totalNX )))) print $1,$2,$3,$4,$5,$6,$10,$11,$12}'  \
+   | grep -v : | sort -g -k 9 | gzip > LOO_results_filtered/aam_ptsd_pcs_v5_jan4_2021_"$LOO_group".fuma.gz
+
+## Case control
+
+
+#Filter to only markers that passed the main analysis
+  #European
+  cat LOO_metal_results/eur_ptsdcasecontrol_pcs_v5_jan4_2021_"$LOO_group"_*.gz1.tbl  \
+  |  awk   '{qcol=$13;gsub("?","",qcol);  if (NR ==1 || ($6 >= 0.01 && $6 <= 0.99 && $3 != "MarkerName" && length(qcol) >= 10)) print $1,$2,$3,$4,$5,$6,$10,$11,$12,$13 }'  \
+  | grep -v : | sort -g -k 9 | gzip > LOO_results_filtered/eur_ptsdcasecontrol_pcs_v5_jan4_2021_"$LOO_group".fuma.gz
+  
+ 
+#African CC
+  cat LOO_metal_results/aam_ptsdcasecontrol_pcs_v5_jan4_2021_"$LOO_group"_*.gz1.tbl  \
+  |  awk   '{qcol=$13;gsub("?","",qcol);  if (NR ==1 || ($6 >= 0.01 && $6 <= 0.99 && $3 != "MarkerName" && length(qcol) >= 10)) print $1,$2,$3,$4,$5,$6,$10,$11,$12,$13 }'  \
+  | grep -v : | sort -g -k 9 | gzip > LOO_results_filtered/aam_ptsdcasecontrol_pcs_v5_jan4_2021_"$LOO_group".fuma.gz
+  
+
+#for each, measure rg with main GWAS, produce a manhattan plot, etc.
+ 
+#LOO analyses may 
+#Loop through the LOO master file, by row
+
+for LOO_info in $(cat LOO_PTSD_f3.csv)
+do
+
+#For a given sample group
+LOO_sample=$(echo $LOO_info | awk '{print $1}')
+
